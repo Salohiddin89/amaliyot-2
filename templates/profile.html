@@ -27,8 +27,9 @@
                 {% endif %}
             </div>
 
-            <h4 style="margin: 0 0 10px 0; color: #444; font-weight: 600;">{{ target_user.first_name }} {{
-                target_user.last_name }}</h4>
+            <h4 style="margin: 0 0 10px 0; color: #444; font-weight: 600;">
+                {{ target_user.first_name }} {{ target_user.last_name }}
+            </h4>
             <p style="margin: 10px 0; color: #666; line-height: 1.5;">{{ target_user.bio|default:"Bio kiritilmagan." }}
             </p>
 
@@ -40,71 +41,94 @@
         </div>
     </div>
 
-    <h3 style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px; color: #1a1a1a; font-weight: 700;">
-        <i class="fa-solid fa-grip" style="color: #4c6ef5;"></i> Postlar ({{ posts.count }})
-    </h3>
-
-    <div
-        style="display: grid; grid-template-columns: repeat({% if request.user == target_user %}2{% else %}3{% endif %}, 1fr); gap: 25px;">
-        {% for post in posts %}
-        <div class="post-card"
-            style="background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; transition: all 0.3s ease; position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
-
-            <a href="{% url 'post_detail' post.pk %}" style="text-decoration: none; color: inherit; display: block;">
-                <div style="position: relative; overflow: hidden;">
-                    {% if post.image %}
-                    <img src="{{ post.image.url }}"
-                        style="width: 100%; height: 220px; object-fit: cover; transition: transform 0.5s ease;"
-                        class="post-img">
-                    {% endif %}
-
-                    {% if post.video %}
-                    <div
-                        style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-                        <i class="fa-solid fa-video" style="font-size: 0.8rem;"></i>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div style="padding: 20px;">
-                    <h4
-                        style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1a1a1a; line-height: 1.4; height: 3rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-                        {{ post.title }}
-                    </h4>
-                    <div
-                        style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; color: #8e8e8e; font-size: 0.85rem;">
-                        <span><i class="fa-regular fa-eye"></i> {{ post.view_count }}</span>
-                        <span>{{ post.created_at|date:"d.m.Y" }}</span>
-                    </div>
-                </div>
-            </a>
-
-            {% if request.user == target_user %}
-            <div style="padding: 0 20px 20px 20px; display: flex; gap: 10px;">
-                <a href="{% url 'edit_post' post.pk %}"
-                    style="flex: 1; text-align: center; text-decoration: none; color: #4c6ef5; background: #edf2ff; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; transition: 0.2s;">
-                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                </a>
-                <a href="{% url 'delete_post' post.pk %}" onclick="return confirm('Rostdan ham o\'chirmoqchimisiz?')"
-                    style="flex: 1; text-align: center; text-decoration: none; color: #fa5252; background: #fff5f5; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; transition: 0.2s;">
-                    <i class="fa-solid fa-trash"></i> Delete
-                </a>
-            </div>
-            {% endif %}
-        </div>
-        {% empty %}
-        <div
-            style="grid-column: span {% if request.user == target_user %}2{% else %}3{% endif %}; text-align: center; padding: 60px; color: #adb5bd; background: #fcfcfc; border-radius: 15px; border: 2px dashed #eee;">
-            <i class="fa-solid fa-box-open" style="font-size: 50px; margin-bottom: 20px; opacity: 0.5;"></i>
-            <p>Hali hech qanday post yuklanmagan.</p>
-        </div>
-        {% endfor %}
+    <div style="display: flex; gap: 30px; margin-bottom: 25px; border-bottom: 2px solid #eee;">
+        <button onclick="switchTab('my-posts')" id="btn-my"
+            style="background: none; border: none; padding: 10px 0; font-weight: 700; cursor: pointer; color: #4c6ef5; border-bottom: 3px solid #4c6ef5; font-size: 1rem; transition: 0.3s;">
+            <i class="fa-solid fa-table-cells"></i> Mening postlarim
+        </button>
+        {% if request.user == target_user %}
+        <button onclick="switchTab('liked-posts')" id="btn-liked"
+            style="background: none; border: none; padding: 10px 0; font-weight: 700; cursor: pointer; color: #888; border-bottom: 3px solid transparent; font-size: 1rem; transition: 0.3s;">
+            <i class="fa-solid fa-heart"></i> Yoqqan postlar
+        </button>
+        {% endif %}
     </div>
+
+    <div id="my-posts-section">
+        <div
+            style="display: grid; grid-template-columns: repeat({% if request.user == target_user %}2{% else %}3{% endif %}, 1fr); gap: 25px;">
+            {% for post in posts %}
+            <div class="post-card"
+                style="background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; transition: all 0.3s ease; position: relative;">
+                <a href="{% url 'post_detail' post.pk %}"
+                    style="text-decoration: none; color: inherit; display: block;">
+                    <div style="position: relative; overflow: hidden;">
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}"
+                            style="width: 100%; height: 220px; object-fit: cover; transition: transform 0.5s ease;"
+                            class="post-img">
+                        {% endif %}
+                    </div>
+                    <div style="padding: 20px;">
+                        <h4
+                            style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1a1a1a; height: 3rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                            {{ post.title }}
+                        </h4>
+                        <div
+                            style="margin-top: 12px; display: flex; justify-content: space-between; color: #8e8e8e; font-size: 0.85rem;">
+                            <span><i class="fa-regular fa-eye"></i> {{ post.view_count }}</span>
+                            <span>{{ post.created_at|date:"d.m.Y" }}</span>
+                        </div>
+                    </div>
+                </a>
+                {% if request.user == target_user %}
+                <div style="padding: 0 20px 20px 20px; display: flex; gap: 10px;">
+                    <a href="{% url 'edit_post' post.pk %}" class="btn-edit">Edit</a>
+                    <a href="{% url 'delete_post' post.pk %}" onclick="return confirm('O\'chirilsinmi?')"
+                        class="btn-delete">Delete</a>
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p style="grid-column: span 3; text-align: center; color: #999; padding: 50px;">Hali postlar yo'q.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if request.user == target_user %}
+    <div id="liked-posts-section" style="display: none;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
+            {% for post in liked_posts %}
+            <div class="post-card"
+                style="background: white; border-radius: 15px; overflow: hidden; border: 1px solid #eee; transition: all 0.3s ease;">
+                <a href="{% url 'post_detail' post.pk %}"
+                    style="text-decoration: none; color: inherit; display: block;">
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" style="width: 100%; height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div style="padding: 15px;">
+                        <h4 style="margin: 0; font-size: 1rem; color: #1a1a1a;">{{ post.title }}</h4>
+                    </div>
+                </a>
+                <div style="padding: 0 15px 15px 15px;">
+                    <a href="{% url 'post_like' post.pk %}"
+                        style="display: block; text-align: center; text-decoration: none; background: #fff5f5; color: #fa5252; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; border: 1px solid #ffe3e3;">
+                        <i class="fa-solid fa-heart-crack"></i> Likeni olib tashlash
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <p style="grid-column: span 2; text-align: center; color: #999; padding: 50px;">Sizga yoqqan postlar
+                hozircha yo'q.</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
     <style>
         .post-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
             border-color: #4c6ef5 !important;
         }
 
@@ -112,20 +136,58 @@
             transform: scale(1.08);
         }
 
-        .post-card a:hover h4 {
-            color: #4c6ef5 !important;
+        .btn-edit,
+        .btn-delete {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: 0.3s;
         }
 
-        /* Tugmalar uchun hover */
-        .post-card a[href*="edit"]:hover {
-            background: #4c6ef5 !important;
-            color: white !important;
+        .btn-edit {
+            color: #4c6ef5;
+            background: #edf2ff;
         }
 
-        .post-card a[href*="delete"]:hover {
-            background: #fa5252 !important;
-            color: white !important;
+        .btn-delete {
+            color: #fa5252;
+            background: #fff5f5;
+        }
+
+        .btn-edit:hover {
+            background: #4c6ef5;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #fa5252;
+            color: white;
         }
     </style>
+
+    <script>
+        function switchTab(tab) {
+            const mySec = document.getElementById('my-posts-section');
+            const likedSec = document.getElementById('liked-posts-section');
+            const btnMy = document.getElementById('btn-my');
+            const btnLiked = document.getElementById('btn-liked');
+
+            if (tab === 'my-posts') {
+                mySec.style.display = 'block';
+                if (likedSec) likedSec.style.display = 'none';
+                btnMy.style.color = '#4c6ef5'; btnMy.style.borderBottomColor = '#4c6ef5';
+                if (btnLiked) { btnLiked.style.color = '#888'; btnLiked.style.borderBottomColor = 'transparent'; }
+            } else {
+                mySec.style.display = 'none';
+                likedSec.style.display = 'block';
+                btnMy.style.color = '#888'; btnMy.style.borderBottomColor = 'transparent';
+                btnLiked.style.color = '#4c6ef5'; btnLiked.style.borderBottomColor = '#4c6ef5';
+            }
+        }
+    </script>
 </div>
 {% endblock %}

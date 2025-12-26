@@ -94,8 +94,7 @@
                 <p style="margin-bottom: 10px;">{{ comment.text }}</p>
 
                 <details style="margin-top: 10px;">
-                    <summary style="font-size: 0.85rem; color: #007bff; cursor: pointer; font-weight: 500;">Javoblar ({{
-                        comment.replies.count }})</summary>
+                    <summary style="font-size: 0.85rem; color: #007bff; cursor: pointer; font-weight: 500;">Javoblar ({{comment.replies.count }})</summary>
                     <div style="margin-left: 20px; border-left: 2px solid #eee; padding-left: 15px; margin-top: 10px;">
                         {% for reply in comment.replies.all %}
                         <div style="margin-bottom: 10px; font-size: 0.95rem;">

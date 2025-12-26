@@ -49,14 +49,21 @@ def post_detail(request, pk):
 
 # --- USER PROFILI (BIOGRAFIA VA POSTLAR) ---
 def user_profile(request, username):
-    target_user = get_object_or_404(
-        User, username=username
-    )  # Standart User o'rniga o'zingiznikini import qiling
+    target_user = get_object_or_404(User, username=username)
     posts = Post.objects.filter(author=target_user).order_by("-created_at")
-    return render(request, "profile.html", {"target_user": target_user, "posts": posts})
+
+    # Foydalanuvchi like bosgan hamma postlarni olish
+    # Post modelida 'likes' RelatedName bo'lishi kerak
+    liked_posts = Post.objects.filter(likes=target_user).order_by("-created_at")
+
+    context = {
+        "target_user": target_user,
+        "posts": posts,
+        "liked_posts": liked_posts,
+    }
+    return render(request, "profile.html", context)  # --- POST YARATISH ---
 
 
-# --- POST YARATISH ---
 @login_required
 def post_create(request):
     if request.method == "POST":
@@ -107,17 +114,17 @@ def delete_post(request, pk):
 
 
 # --- LIKE TIZIMI ---
-@login_required
-def post_like(request, pk):
-    if request.method == "POST":  # Like faqat POST orqali bo'lishi kerak
-        post = get_object_or_404(Post, id=pk)
-        if post.likes.filter(id=request.user.id).exists():
-            post.likes.remove(request.user)
-        else:
-            post.likes.add(request.user)
 
-    # Qayerdan kelgan bo'lsa, o'sha yerga qaytaradi (Home yoki Detail)
-    return redirect(request.META.get("HTTP_REFERER", "home"))
+def post_like(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)  # Likeni olib tashlash
+    else:
+        post.likes.add(request.user)  # Like qo'shish
+
+    # Eng muhim joyi: foydalanuvchi qayerdan bosgan bo'lsa, o'sha sahifaga qaytaradi
+    return redirect(request.META.get("HTTP_REFERER", "post_detail"))
 
 
 # --- AUTH (LOGIN, REGISTER, LOGOUT) ---
