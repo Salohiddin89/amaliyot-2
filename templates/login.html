@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div
+    style="max-width: 400px; margin: 50px auto; background: white; padding: 30px; border: 1px solid var(--border); border-radius: 8px;">
+    <h2 style="text-align: center; margin-bottom: 25px;">Tizimga kirish</h2>
+    <form method="post">
+        {% csrf_token %}
+        <style>
+            input {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+            }
+        </style>
+        {{ form.as_p }}
+        <button type="submit" class="btn-add"
+            style="width: 100%; border: none; padding: 10px; cursor: pointer;">Kirish</button>
+    </form>
+    <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+        Profilingiz yo'qmi? <a href="{% url 'register' %}"
+            style="color: var(--accent); text-decoration: none;">Ro'yxatdan o'ting</a>
+    </p>
+</div>
+{% endblock %}

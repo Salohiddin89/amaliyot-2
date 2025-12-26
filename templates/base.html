@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniBlog | Professional Network</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #fafafa;
+            --white: #ffffff;
+            --text: #262626;
+            --accent: #4c6ef5;
+            --border: #dbdbdb;
+            --gray: #8e8e8e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        nav {
+            background: var(--white);
+            border-bottom: 1px solid #f0f0f0;
+            padding: 0.7rem 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-post {
+            text-decoration: none;
+            background: var(--accent);
+            color: white !important;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+        }
+
+        .btn-post:hover { opacity: 0.9; }
+
+        .user-link {
+            text-decoration: none;
+            color: #4a4a4a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .main-container {
+            max-width: 1100px; /* Siz xohlagan kenglikka moslandi */
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .cat-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .cat-item {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 6px 18px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 0.85rem;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .cat-item:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="{% url 'home' %}" class="logo">
+            Mini<span style="color: #262626;">Blog</span>
+        </a>
+
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'post_create' %}" class="btn-post">
+                    <i class="fa-solid fa-plus"></i> Post qo'shish
+                </a>
+
+                <a href="{% url 'user_profile' user.username %}" class="user-link">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);">
+                    {% else %}
+                        <i class="fa-solid fa-circle-user" style="font-size: 24px; color: #adb5bd;"></i>
+                    {% endif %}
+                    {{ user.username }}
+                </a>
+
+                <a href="{% url 'logout' %}" style="text-decoration: none; color: #fa5252; font-weight: 600; font-size: 0.9rem; margin-left: 10px;">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" style="text-decoration: none; color: #4a4a4a; font-weight: 600; font-size: 0.9rem;">Kirish</a>
+                <a href="{% url 'register' %}" class="btn-post" style="background: #262626;">Ro'yxatdan o'tish</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="main-container">
+        {% if categories and request.path == '/' %}
+        <div class="cat-filter">
+            <a href="{% url 'home' %}" class="cat-item">Hammasi</a>
+            {% for cat in categories %}
+            <a href="?cat={{ cat.slug }}" class="cat-item">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer>
+        &copy; 2025 MiniBlog Professional. Barcha huquqlar himoyalangan.
+    </footer>
+
+</body>
+</html>

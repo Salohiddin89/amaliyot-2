@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 700px; margin: 50px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+    <h2 style="margin-bottom: 25px; text-align: center; color: #262626;">Yangi Post Yaratish</h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #495057;">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+                <small style="color: #fa5252;">{{ field.errors }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <style>
+            input[type="text"], textarea, select, input[type="file"] {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                font-size: 1rem;
+                box-sizing: border-box;
+            }
+            textarea { height: 150px; resize: vertical; }
+            .btn-save {
+                background: #4c6ef5;
+                color: white;
+                border: none;
+                padding: 14px;
+                width: 100%;
+                border-radius: 8px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+            .btn-save:hover { background: #3b5bdb; }
+        </style>
+
+        <button type="submit" class="btn-save">Nashr qilish</button>
+    </form>
+</div>
+{% endblock %}

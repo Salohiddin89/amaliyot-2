@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container"
+    style="max-width: 1100px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 20px;">
+
+    <div class="main-content">
+        <div style="background: white; padding: 25px; border-radius: 15px; border: 1px solid #eee;">
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <a href="{% url 'user_profile' post.author.username %}"
+                    style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: black;">
+
+                    {% if post.author.avatar %}
+                    <img src="{{ post.author.avatar.url }}"
+                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 1px solid #eee;">
+                    {% else %}
+                    <div
+                        style="width: 45px; height: 45px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-user" style="color: #adb5bd;"></i>
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <strong style="display: block;">{{ post.author.username }}</strong>
+                        <small style="color: gray;">{{ post.created_at|date:"d.m.Y" }}</small>
+                    </div>
+                </a>
+                <span style="color: gray; font-size: 0.9rem;"><i class="fa-regular fa-eye"></i> {{ post.view_count}}</span>
+            </div>
+
+            <h1 style="font-size: 2.2rem; margin-bottom: 20px; line-height: 1.2;">{{ post.title }}</h1>
+
+            {% if post.video %}
+            <video controls style="width: 100%; border-radius: 12px; margin-bottom: 20px; background: #000;">
+                <source src="{{ post.video.url }}" type="video/mp4">
+                Brauzeringiz videoni qo'llab-quvvatlamaydi.
+            </video>
+            {% else %}
+            <img src="{{ post.image.url }}"
+                style="width: 100%; border-radius: 12px; margin-bottom: 20px; object-fit: cover;">
+            {% endif %}
+
+            <div
+                style="background: #fdfdfd; padding: 15px; border-left: 5px solid #007bff; margin-bottom: 20px; border-radius: 5px;">
+                <p style="margin: 0; font-weight: 500; color: #555; font-size: 1.1rem;">
+                    {{ post.short_description }}
+                </p>
+            </div>
+
+            <div style="line-height: 1.8; font-size: 1.1rem; white-space: pre-line; margin-bottom: 30px; color: #333;">
+                {{ post.content }}
+            </div>
+
+            <div style="border-top: 1px solid #eee; padding-top: 20px;">
+                <form
+                    action="{% if user.is_authenticated %}{% url 'post_like' post.id %}{% else %}{% url 'login' %}{% endif %}"
+                    method="POST">
+                    {% csrf_token %}
+                    <button type="submit"
+                        style="background: #f8f9fa; border: 1px solid #ddd; padding: 10px 20px; border-radius: 30px; cursor: pointer; transition: 0.3s;">
+                        {% if user in post.likes.all %} <span style="color: red;">❤️</span> {% else %} 🤍 {% endif %} {{post.likes.count }} Likes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <h3>Fikrlar ({{ post.comments.count }})</h3>
+
+            {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'add_comment' post.id %}" style="margin-bottom: 30px;">
+                {% csrf_token %}
+                <textarea name="text" required
+                    style="width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit;"
+                    placeholder="Fikr qoldiring..."></textarea>
+                <button type="submit"
+                    style="margin-top: 10px; padding: 8px 25px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Yuborish</button>
+            </form>
+            {% else %}
+            <p style="background: #fff3cd; padding: 10px; border-radius: 8px; color: #856404;">
+                <a href="{% url 'login' %}" style="font-weight: bold; color: #856404;">Kirish</a> orqali fikr
+                qoldirishingiz mumkin.
+            </p>
+            {% endif %}
+
+            {% for comment in post.comments.all %}
+            {% if not comment.parent %}
+            <div
+                style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #f0f0f0;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <strong>{{ comment.user.username }}</strong>
+                    <small style="color: #bbb;">{{ comment.created_at|timesince }} oldin</small>
+                </div>
+                <p style="margin-bottom: 10px;">{{ comment.text }}</p>
+
+                <details style="margin-top: 10px;">
+                    <summary style="font-size: 0.85rem; color: #007bff; cursor: pointer; font-weight: 500;">Javoblar ({{
+                        comment.replies.count }})</summary>
+                    <div style="margin-left: 20px; border-left: 2px solid #eee; padding-left: 15px; margin-top: 10px;">
+                        {% for reply in comment.replies.all %}
+                        <div style="margin-bottom: 10px; font-size: 0.95rem;">
+                            <strong>{{ reply.user.username }}</strong>: {{ reply.text }}
+                        </div>
+                        {% endfor %}
+
+                        {% if user.is_authenticated %}
+                        <form method="POST" action="{% url 'add_comment' post.id %}"
+                            style="margin-top: 10px; display: flex; gap: 5px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                            <input name="text" required
+                                style="flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+                                placeholder="Javob yozish...">
+                            <button type="submit"
+                                style="padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">OK</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </details>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <aside>
+        <div
+            style="background: white; padding: 20px; border-radius: 15px; border: 1px solid #eee; position: sticky; top: 20px;">
+            <h4 style="margin-top: 0; border-bottom: 2px solid #007bff; padding-bottom: 8px; display: inline-block;">
+                O'xshash postlar</h4>
+            <div style="margin-top: 15px;">
+                {% for related in related_posts %}
+                <a href="{% url 'post_detail' related.id %}"
+                    style="display: flex; gap: 10px; margin-bottom: 15px; text-decoration: none; color: black; align-items: center;">
+                    <img src="{{ related.image.url }}"
+                        style="width: 70px; height: 55px; border-radius: 8px; object-fit: cover;">
+                    <span style="font-weight: 600; font-size: 0.9rem; line-height: 1.2;">{{related.title|truncatechars:35 }}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            <h4 style="margin-top: 30px; border-bottom: 2px solid #6c757d; padding-bottom: 8px; display: inline-block;">
+                So'nggi postlar</h4>
+            <div style="margin-top: 15px;">
+                {% for last in latest_posts %}
+                <a href="{% url 'post_detail' last.id %}"
+                    style="display: block; margin-bottom: 12px; text-decoration: none; font-size: 0.9rem; color: #444; border-bottom: 1px solid #f9f9f9; padding-bottom: 5px;">
+                    {{ last.title|truncatechars:50 }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

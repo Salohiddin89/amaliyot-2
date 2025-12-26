@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div
+    style="max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; border: 1px solid #dbdbdb; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <h2 style="margin-bottom: 25px; text-align: center; color: #262626;">Profilni tahrirlash</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #444;">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <small style="color: red;">{{ field.errors }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit"
+            style="width: 100%; background: #4c6ef5; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem;">
+            O'zgarishlarni saqlash
+        </button>
+
+        <a href="{% url 'user_profile' user.username %}"
+            style="display: block; text-align: center; margin-top: 15px; text-decoration: none; color: #8e8e8e; font-size: 0.9rem;">Bekor
+            qilish</a>
+    </form>
+</div>
+
+<style>
+    input,
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #dbdbdb;
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+    }
+
+    input:focus {
+        border-color: #4c6ef5;
+        outline: none;
+    }
+</style>
+{% endblock %}

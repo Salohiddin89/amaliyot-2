@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div
+    style="max-width: 800px; margin: 40px auto; background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+    <h2 style="margin-bottom: 30px; font-weight: 800; color: #1a1a1a;">
+        {% if edit_mode %}Postni tahrirlash{% else %}Yangi post yaratish{% endif %}
+    </h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="grid-column: span 2;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Sarlavha</label>
+                {{ form.title }}
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Post rasmi</label>
+                {{ form.image }}
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Post videosi</label>
+                {{ form.video }}
+            </div>
+
+            <div style="grid-column: span 2;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Kategoriya</label>
+                {{ form.category }}
+            </div>
+
+            <div style="grid-column: span 2;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Qisqa ta'rif</label>
+                {{ form.short_description }}
+            </div>
+
+            <div style="grid-column: span 2;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">To'liq maqola</label>
+                {{ form.content }}
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; display: flex; gap: 15px;">
+            <button type="submit"
+                style="flex: 2; background: #262626; color: white; padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1rem;">
+                {% if edit_mode %}O'zgarishlarni saqlash{% else %}Postni nashr qilish{% endif %}
+            </button>
+            <a href="javascript:history.back()"
+                style="flex: 1; text-align: center; background: #fff; color: #ff4d4d; padding: 15px; border: 2px solid #ff4d4d; border-radius: 12px; text-decoration: none; font-weight: 700;">Bekor
+                qilish</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    input,
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        height: 150px;
+    }
+</style>
+{% endblock %}

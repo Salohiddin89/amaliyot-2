@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div
+    style="max-width: 450px; margin: 30px auto; background: white; padding: 30px; border: 1px solid var(--border); border-radius: 8px;">
+    <h2 style="text-align: center; margin-bottom: 20px;">Ro'yxatdan o'tish</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <style>
+            input,
+            textarea {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                font-family: inherit;
+            }
+
+            label {
+                font-size: 0.85rem;
+                color: var(--gray);
+            }
+        </style>
+        {{ form.as_p }}
+        <button type="submit" class="btn-add" style="width: 100%; border: none; padding: 12px; cursor: pointer;">Hisob
+            yaratish</button>
+    </form>
+</div>
+{% endblock %}
